@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgencyOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #0b0b10;
+  --bg2: #13131a;
+  --bg3: #1a1a24;
+  --bg4: #22222f;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #7c6ff7;
+  --accent2: #9d93f9;
+  --green: #1fc88a;
+  --red: #f05c5c;
+  --amber: #f59e0b;
+  --blue: #3b9eff;
+  --text: #f0f0f8;
+  --text2: #9898b0;
+  --text3: #5a5a72;
+  --sidebar-w: 220px;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; overflow: hidden; }
+h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+
+/* ═══════════════ LOGIN ═══════════════ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+}
+.login-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+.login-sub { color: var(--text2); font-size: 13px; margin-bottom: 28px; }
+.login-tabs { display: flex; gap: 0; margin-bottom: 24px; background: var(--bg3); border-radius: 8px; padding: 3px; }
+.login-tab { flex: 1; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.2s; border: none; background: transparent; font-family: 'Inter', sans-serif; }
+.login-tab.active { background: var(--bg4); color: var(--text); }
+.login-field { margin-bottom: 14px; }
+.login-field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.login-field input {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  outline: none; transition: border 0.2s;
+}
+.login-field input:focus { border-color: var(--accent); }
+.btn-primary {
+  width: 100%; padding: 11px; background: var(--accent);
+  border: none; border-radius: 8px; color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.2s; margin-top: 4px;
+}
+.btn-primary:hover { opacity: 0.85; }
+.login-divider { text-align: center; color: var(--text3); font-size: 12px; margin: 16px 0; }
+.btn-google {
+  width: 100%; padding: 11px; background: var(--bg3);
+  border: 1px solid var(--border2); border-radius: 8px; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 14px;
+  cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-google:hover { background: var(--bg4); }
+.login-badge {
+  margin-top: 20px; display: flex; align-items: center; gap: 6px;
+  background: rgba(31,200,138,0.1); border: 1px solid rgba(31,200,138,0.2);
+  border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--green);
+}
+.login-error { background: rgba(240,92,92,0.1); border: 1px solid rgba(240,92,92,0.2); border-radius: 8px; padding: 8px 12px; font-size: 12px; color: var(--red); margin-top: 10px; display: none; }
+
+/* ═══════════════ APP LAYOUT ═══════════════ */
+#app { display: none; height: 100vh; flex-direction: row; }
+#app.visible { display: flex; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w);
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 20px 12px;
+  overflow-y: auto;
+}
+.sidebar-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent); padding: 0 8px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.sidebar-logo span { color: var(--text2); font-weight: 400; font-size: 12px; display: block; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  color: var(--text2); font-size: 13px; transition: all 0.15s;
+  margin-bottom: 2px; border: none; background: transparent; width: 100%; text-align: left;
+  font-family: 'Inter', sans-serif;
+}
+.nav-item i { font-size: 17px; flex-shrink: 0; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(124,111,247,0.15); color: var(--accent2); }
+.sidebar-section { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); padding: 12px 10px 4px; }
+.sidebar-bottom { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  transition: background 0.15s;
+}
+.user-chip:hover { background: var(--bg3); }
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.user-info { overflow: hidden; }
+.user-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-email { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-left: auto; flex-shrink: 0; }
+.sync-dot.syncing { animation: pulse 1s infinite; background: var(--amber); }
+.sync-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  height: 54px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+  background: var(--bg2); flex-shrink: 0;
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* ═══════════════ COMPONENTS ═══════════════ */
+.btn {
+  padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+}
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: var(--accent2); }
+.btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: var(--text); background: var(--bg4); }
+.btn-danger { background: rgba(240,92,92,0.15); color: var(--red); border: 1px solid rgba(240,92,92,0.2); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.card-sm { padding: 14px 16px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 500;
+}
+.badge-green { background: rgba(31,200,138,0.15); color: var(--green); }
+.badge-red { background: rgba(240,92,92,0.15); color: var(--red); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.badge-blue { background: rgba(59,158,255,0.15); color: var(--blue); }
+.badge-purple { background: rgba(124,111,247,0.15); color: var(--accent2); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; display: none;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); padding: 28px; width: 100%; max-width: 480px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 9px 12px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+  outline: none; transition: border 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+.form-group select option { background: var(--bg3); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* ═══════════════ DASHBOARD ═══════════════ */
+.metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.metric-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px;
+}
+.metric-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.metric-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+.metric-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.progress-bar { height: 6px; background: var(--bg4); border-radius: 99px; overflow: hidden; margin-top: 10px; }
+.progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width 0.5s; }
+
+/* ═══════════════ PROJETOS ═══════════════ */
+.clients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; }
+.client-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px; cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.client-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.client-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.client-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-family: 'Syne', sans-serif; font-weight: 700; flex-shrink: 0; }
+.client-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+.client-segment { font-size: 12px; color: var(--text2); }
+.client-stats { display: flex; gap: 14px; }
+.client-stat { font-size: 12px; color: var(--text2); }
+.client-stat strong { color: var(--text); }
+
+/* CLIENT VIEW */
+.client-view { display: none; }
+.client-view.open { display: block; }
+.clients-list { }
+.clients-list.hidden { display: none; }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text2); font-size: 13px; cursor: pointer;
+  margin-bottom: 18px; transition: color 0.15s; background: none; border: none; font-family: 'Inter', sans-serif;
+}
+.back-btn:hover { color: var(--text); }
+
+.tabs { display: flex; gap: 0; margin-bottom: 20px; background: var(--bg3); border-radius: 10px; padding: 4px; width: fit-content; }
+.tab-btn {
+  padding: 7px 16px; border-radius: 7px; cursor: pointer;
+  font-size: 13px; color: var(--text2); transition: all 0.15s;
+  border: none; background: transparent; font-family: 'Inter', sans-serif;
+}
+.tab-btn.active { background: var(--bg4); color: var(--text); }
+
+/* TASKS TABLE */
+.tasks-table { width: 100%; border-collapse: collapse; }
+.tasks-table th {
+  text-align: left; padding: 10px 12px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text3); border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.tasks-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.tasks-table tr:last-child td { border-bottom: none; }
+.tasks-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.status-pill {
+  padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: opacity 0.15s; white-space: nowrap; border: none;
+  font-family: 'Inter', sans-serif;
+}
+.status-pill:hover { opacity: 0.8; }
+
+.priority-stars { display: flex; gap: 2px; cursor: pointer; }
+.priority-stars i { font-size: 14px; color: var(--text3); transition: color 0.15s; }
+.priority-stars i.active { color: var(--amber); }
+
+.timeline-btn {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 4px 10px; font-size: 12px;
+  cursor: pointer; color: var(--text2); transition: all 0.15s;
+  font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 5px;
+}
+.timeline-btn:hover { border-color: var(--accent); color: var(--text); }
+
+/* KANBAN */
+.kanban-board { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; }
+.kanban-col { min-width: 260px; background: var(--bg3); border-radius: var(--radius-lg); padding: 14px; }
+.kanban-col-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.kanban-count { background: var(--bg4); padding: 2px 7px; border-radius: 99px; font-size: 11px; }
+.kanban-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.kanban-card-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.kanban-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ═══════════════ CALENDAR ═══════════════ */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day-name { text-align: center; font-size: 11px; color: var(--text3); padding: 6px; }
+.cal-day {
+  min-height: 70px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px; cursor: pointer; transition: border-color 0.15s;
+}
+.cal-day:hover { border-color: var(--border2); }
+.cal-day.today { border-color: var(--accent); }
+.cal-day.other-month { opacity: 0.35; }
+.cal-day-num { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.cal-day.today .cal-day-num { color: var(--accent); font-weight: 700; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin: 1px; }
+
+/* ═══════════════ CRM ═══════════════ */
+.crm-board { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; }
+.crm-stage { min-width: 220px; background: var(--bg3); border-radius: var(--radius-lg); padding: 14px; }
+.crm-stage-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.crm-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.crm-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.crm-contact { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.crm-value { font-size: 13px; color: var(--green); font-weight: 600; }
+
+/* ═══════════════ APPROVALS ═══════════════ */
+.approvals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.approval-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+.approval-type { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.approval-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.approval-client { font-size: 12px; color: var(--text2); margin-bottom: 14px; }
+.approval-actions { display: flex; gap: 8px; }
+
+/* ═══════════════ FINANCEIRO ═══════════════ */
+#fin-lock {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+.fin-lock-card {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); padding: 36px; text-align: center; max-width: 340px; width: 100%;
+}
+.fin-lock-icon { font-size: 40px; color: var(--accent); margin-bottom: 16px; }
+.fin-lock-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.fin-lock-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+.fin-pin-input {
+  width: 100%; padding: 12px; text-align: center;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-size: 20px; letter-spacing: 4px;
+  outline: none; transition: border 0.2s; font-family: 'Inter', sans-serif;
+}
+.fin-pin-input:focus { border-color: var(--accent); }
+
+.fin-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.fin-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+.fin-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+.fin-value { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+
+.chart-bars { display: flex; align-items: flex-end; gap: 10px; height: 140px; padding: 0 4px; }
+.chart-bar-group { flex: 1; display: flex; gap: 3px; align-items: flex-end; }
+.chart-bar { flex: 1; border-radius: 4px 4px 0 0; transition: height 0.5s; min-width: 10px; cursor: pointer; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-label { font-size: 10px; color: var(--text3); text-align: center; margin-top: 6px; }
+
+/* ═══════════════ TEAM ═══════════════ */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 14px; }
+.member-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; text-align: center; }
+.member-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0 auto 12px; }
+.member-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.member-role { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
+.member-email { font-size: 12px; color: var(--accent2); }
+
+/* ═══════════════ COLORS ═══════════════ */
+.color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-swatch { width: 26px; height: 26px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+.color-swatch:hover, .color-swatch.selected { border-color: #fff; transform: scale(1.1); }
+.color-custom { width: 26px; height: 26px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid var(--border2); }
+.color-custom input { width: 200%; height: 200%; margin: -50%; opacity: 0; cursor: pointer; }
+
+/* ═══════════════ INTEGRATIONS ═══════════════ */
+.integrations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 12px; }
+.integration-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; gap: 12px; }
+.integration-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.integration-name { font-size: 13px; font-weight: 600; }
+.integration-status { font-size: 11px; color: var(--text2); }
+.toggle { position: relative; width: 36px; height: 20px; margin-left: auto; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--bg4); border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ═══════════════ ALERTS ═══════════════ */
+.alert-banner { padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.alert-red { background: rgba(240,92,92,0.1); border: 1px solid rgba(240,92,92,0.2); color: var(--red); }
+.alert-amber { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(--amber); }
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .metrics-grid { grid-template-columns: repeat(2,1fr); }
+  .fin-grid { grid-template-columns: repeat(2,1fr); }
+  #bottom-nav { display: flex !important; }
+  .content { padding: 16px; padding-bottom: 70px; }
+}
+#bottom-nav {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg2); border-top: 1px solid var(--border);
+  padding: 8px; z-index: 100; gap: 4px;
+}
+.bottom-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px; border-radius: 8px; cursor: pointer; color: var(--text3);
+  font-size: 10px; transition: all 0.15s; border: none; background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+.bottom-nav-item i { font-size: 20px; }
+.bottom-nav-item.active { color: var(--accent); background: rgba(124,111,247,0.1); }
+
+/* STATUS MANAGEMENT */
+.status-manager { display: flex; flex-direction: column; gap: 10px; }
+.status-row { display: flex; align-items: center; gap: 10px; }
+.status-color-preview { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; }
+
+/* IA BANNER */
+.ia-banner { background: linear-gradient(135deg, rgba(124,111,247,0.15), rgba(59,158,255,0.1)); border: 1px solid rgba(124,111,247,0.25); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start; }
+.ia-banner i { color: var(--accent); font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.ia-text { font-size: 13px; line-height: 1.6; color: var(--text2); }
+.ia-text strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN ═══════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">AgencyOS</div>
+    <div class="login-sub">Seu Work OS para agências de marketing</div>
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('login')">Entrar</button>
+      <button class="login-tab" onclick="switchLoginTab('register')">Criar conta</button>
+    </div>
+    <div id="login-form">
+      <div class="login-field"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com"></div>
+      <div class="login-field"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="loginEmail()">Entrar</button>
+      <div class="login-divider">ou</div>
+      <button class="btn-google" onclick="loginGoogle()"><i class="ti ti-brand-google"></i> Continuar com Google</button>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="login-field"><label>Nome</label><input type="text" id="reg-name" placeholder="Seu nome"></div>
+      <div class="login-field"><label>E-mail</label><input type="email" id="reg-email" placeholder="seu@email.com"></div>
+      <div class="login-field"><label>Senha</label><input type="password" id="reg-pass" placeholder="mínimo 6 caracteres"></div>
+      <button class="btn-primary" onclick="registerEmail()">Criar conta</button>
+    </div>
+    <div class="login-badge"><i class="ti ti-cloud-check"></i> Dados sincronizados em tempo real na nuvem</div>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">AgencyOS <span id="sidebar-user-name">Carregando...</span></div>
+    <div class="sidebar-section">Principal</div>
+    <button class="nav-item active" data-section="dashboard" onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-item" data-section="projects" onclick="nav('projects')"><i class="ti ti-folders"></i> Projetos</button>
+    <button class="nav-item" data-section="calendar" onclick="nav('calendar')"><i class="ti ti-calendar"></i> Calendário</button>
+    <div class="sidebar-section">Comercial</div>
+    <button class="nav-item" data-section="crm" onclick="nav('crm')"><i class="ti ti-users"></i> CRM</button>
+    <button class="nav-item" data-section="approvals" onclick="nav('approvals')"><i class="ti ti-check"></i> Aprovações</button>
+    <div class="sidebar-section">Gestão</div>
+    <button class="nav-item" data-section="financial" onclick="nav('financial')"><i class="ti ti-chart-bar"></i> Financeiro</button>
+    <button class="nav-item" data-section="team" onclick="nav('team')"><i class="ti ti-user-circle"></i> Equipe</button>
+    <button class="nav-item" data-section="integrations" onclick="nav('integrations')"><i class="ti ti-plug"></i> Integrações</button>
+    <div class="sidebar-bottom">
+      <div class="user-chip" onclick="logout()">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-email">...</div>
+          <div style="font-size:11px;color:var(--text2)">Sair da conta</div>
+        </div>
+        <div class="sync-dot" id="sync-dot" title="Sincronizado"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h2 class="topbar-title" id="topbar-title">Dashboard</h2>
+      <div class="topbar-right">
+        <span id="topbar-sync" style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;"><i class="ti ti-cloud-check" style="font-size:14px;color:var(--green)"></i> Sincronizado</span>
+        <button class="btn btn-accent btn-sm" id="topbar-add-btn" onclick="topbarAdd()" style="display:none"><i class="ti ti-plus"></i> <span id="topbar-add-label">Adicionar</span></button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section id="sec-dashboard" class="content">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label"><i class="ti ti-folders" style="color:var(--accent)"></i> Clientes ativos</div>
+          <div class="metric-value" id="m-clients">0</div>
+          <div class="metric-sub">projetos em andamento</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label"><i class="ti ti-list-check" style="color:var(--blue)"></i> Total de tarefas</div>
+          <div class="metric-value" id="m-total">0</div>
+          <div class="metric-sub">em todos os clientes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label"><i class="ti ti-circle-check" style="color:var(--green)"></i> Concluídas</div>
+          <div class="metric-value" id="m-done">0</div>
+          <div class="metric-sub">tarefas finalizadas</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label"><i class="ti ti-trending-up" style="color:var(--amber)"></i> Taxa de conclusão</div>
+          <div class="metric-value" id="m-rate">0%</div>
+          <div class="progress-bar"><div class="progress-fill" id="m-progress" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <h3 style="font-size:14px;margin-bottom:14px">Progresso por cliente</h3>
+          <div id="dash-clients-progress"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:14px;margin-bottom:14px">Últimas tarefas</h3>
+          <div id="dash-recent-tasks"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJETOS -->
+    <section id="sec-projects" class="content" style="display:none">
+      <div id="projects-list-view">
+        <div id="clients-grid" class="clients-grid"></div>
+      </div>
+      <div id="project-client-view" style="display:none">
+        <button class="back-btn" onclick="backToClients()"><i class="ti ti-arrow-left"></i> Voltar para clientes</button>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <div id="cv-icon" class="client-icon" style="width:48px;height:48px;font-size:20px"></div>
+          <div>
+            <h2 id="cv-name" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800"></h2>
+            <div id="cv-segment" style="font-size:13px;color:var(--text2)"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openAddTaskModal()"><i class="ti ti-plus"></i> Nova tarefa</button>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchClientTab('tasks')">Tarefas</button>
+          <button class="tab-btn" onclick="switchClientTab('kanban')">Kanban</button>
+          <button class="tab-btn" onclick="switchClientTab('status')">Status</button>
+        </div>
+        <div id="client-tab-tasks">
+          <div style="overflow-x:auto">
+            <table class="tasks-table">
+              <thead><tr>
+                <th>Tarefa</th>
+                <th>Responsável</th>
+                <th>Status</th>
+                <th>Progresso</th>
+                <th>Prazo</th>
+                <th>Prioridade</th>
+                <th>Ações</th>
+              </tr></thead>
+              <tbody id="tasks-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="client-tab-kanban" style="display:none">
+          <div class="kanban-board" id="kanban-board"></div>
+        </div>
+        <div id="client-tab-status" style="display:none">
+          <div class="card" style="max-width:500px">
+            <h3 style="font-size:14px;margin-bottom:16px">Gerenciar status</h3>
+            <div id="status-manager-list" class="status-manager"></div>
+            <div style="margin-top:14px;display:flex;gap:8px">
+              <input type="text" id="new-status-name" placeholder="Nome do status" style="flex:1;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none">
+              <input type="color" id="new-status-color" value="#7c6ff7" style="width:40px;height:38px;border:none;border-radius:8px;cursor:pointer;background:none">
+              <button class="btn btn-accent btn-sm" onclick="addStatus()">Adicionar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDÁRIO -->
+    <section id="sec-calendar" class="content" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <button class="btn btn-ghost btn-sm" onclick="calNav(-1)"><i class="ti ti-chevron-left"></i></button>
+        <h3 id="cal-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;min-width:160px;text-align:center"></h3>
+        <button class="btn btn-ghost btn-sm" onclick="calNav(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <div class="calendar-grid" id="cal-grid"></div>
+      <div style="margin-top:24px">
+        <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Próximos prazos</h3>
+        <div id="upcoming-tasks"></div>
+      </div>
+    </section>
+
+    <!-- CRM -->
+    <section id="sec-crm" class="content" style="display:none">
+      <div class="crm-board" id="crm-board"></div>
+    </section>
+
+    <!-- APROVAÇÕES -->
+    <section id="sec-approvals" class="content" style="display:none">
+      <div class="approvals-grid" id="approvals-grid"></div>
+    </section>
+
+    <!-- FINANCEIRO -->
+    <section id="sec-financial" class="content" style="display:none;position:relative">
+      <div id="fin-lock">
+        <div class="fin-lock-card">
+          <div class="fin-lock-icon"><i class="ti ti-lock"></i></div>
+          <div class="fin-lock-title">Área restrita</div>
+          <div class="fin-lock-sub">Digite a senha para acessar o financeiro</div>
+          <input type="password" class="fin-pin-input" id="fin-pin" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')checkFinPin()">
+          <button class="btn btn-accent" style="width:100%;margin-top:12px" onclick="checkFinPin()">Acessar</button>
+          <div class="login-error" id="fin-pin-error"></div>
+        </div>
+      </div>
+      <div id="fin-content" style="display:none">
+        <div id="fin-alerts"></div>
+        <div id="ia-insight" class="ia-banner" style="display:none"><i class="ti ti-sparkles"></i><div class="ia-text" id="ia-text">Analisando seus dados...</div></div>
+        <div class="fin-grid">
+          <div class="fin-card"><div class="fin-label">Entradas</div><div class="fin-value" id="fin-in" style="color:var(--green)">R$ 0</div></div>
+          <div class="fin-card"><div class="fin-label">Saídas</div><div class="fin-value" id="fin-out" style="color:var(--red)">R$ 0</div></div>
+          <div class="fin-card"><div class="fin-label">Saldo</div><div class="fin-value" id="fin-bal">R$ 0</div></div>
+          <div class="fin-card"><div class="fin-label">Melhor mês</div><div class="fin-value" id="fin-best" style="color:var(--amber)">R$ 0</div></div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h3 style="font-size:14px">Últimos 6 meses</h3>
+          </div>
+          <div class="chart-bars" id="fin-chart"></div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-size:11px">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--green);border-radius:3px;display:inline-block"></span>Entradas</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;background:var(--red);border-radius:3px;display:inline-block"></span>Saídas</span>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <h3 style="font-size:14px">Extrato</h3>
+            <div style="display:flex;gap:8px">
+              <select id="fin-filter-month" onchange="renderFinancial()" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none">
+                <option value="">Todos os meses</option>
+              </select>
+              <button class="btn btn-accent btn-sm" onclick="openFinModal('entry')"><i class="ti ti-plus"></i> Entrada</button>
+              <button class="btn btn-ghost btn-sm" onclick="openFinModal('exit')"><i class="ti ti-minus"></i> Saída</button>
+              <button class="btn btn-ghost btn-sm" onclick="openChargeModal()"><i class="ti ti-receipt"></i> Cobrança</button>
+            </div>
+          </div>
+          <div id="fin-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPE -->
+    <section id="sec-team" class="content" style="display:none">
+      <div id="team-banner" class="alert-banner alert-amber" style="margin-bottom:20px"><i class="ti ti-info-circle"></i> Os e-mails dos membros são usados para enviar convites do Google Agenda.</div>
+      <div class="team-grid" id="team-grid"></div>
+    </section>
+
+    <!-- INTEGRAÇÕES -->
+    <section id="sec-integrations" class="content" style="display:none">
+      <div class="integrations-grid" id="integrations-grid"></div>
+    </section>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <div id="bottom-nav">
+    <button class="bottom-nav-item active" onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i>Home</button>
+    <button class="bottom-nav-item" onclick="nav('projects')"><i class="ti ti-folders"></i>Projetos</button>
+    <button class="bottom-nav-item" onclick="nav('crm')"><i class="ti ti-users"></i>CRM</button>
+    <button class="bottom-nav-item" onclick="nav('financial')"><i class="ti ti-chart-bar"></i>Finanças</button>
+    <button class="bottom-nav-item" onclick="nav('team')"><i class="ti ti-user-circle"></i>Equipe</button>
+  </div>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<!-- Add Client -->
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <h3 class="modal-title">Novo cliente</h3>
+    <div class="form-group"><label>Nome do cliente</label><input type="text" id="c-name" placeholder="Ex: Marca X"></div>
+    <div class="form-group"><label>Segmento</label><input type="text" id="c-segment" placeholder="Ex: E-commerce, Restaurante..."></div>
+    <div class="form-group"><label>Cor</label>
+      <div class="color-swatches" id="client-color-swatches"></div>
+    </div>
+    <input type="hidden" id="c-color" value="#7c6ff7">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-client')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveClient()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal">
+    <h3 class="modal-title">Nova tarefa</h3>
+    <div class="form-group"><label>Título da tarefa</label><input type="text" id="t-title" placeholder="Ex: Criar artes para campanha"></div>
+    <div class="form-group"><label>Responsável</label><input type="text" id="t-resp" placeholder="Nome do responsável"></div>
+    <div class="form-group"><label>Status</label><select id="t-status"></select></div>
+    <div class="form-group"><label>Prazo</label><input type="date" id="t-deadline"></div>
+    <div class="form-group"><label>Prioridade (1-3 estrelas)</label>
+      <div class="priority-stars" id="modal-stars" style="cursor:pointer">
+        <i class="ti ti-star" data-v="1"></i>
+        <i class="ti ti-star" data-v="2"></i>
+        <i class="ti ti-star" data-v="3"></i>
+      </div>
+    </div>
+    <input type="hidden" id="t-priority" value="1">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-task')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveTask()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CRM Lead -->
+<div class="modal-overlay" id="modal-lead">
+  <div class="modal">
+    <h3 class="modal-title">Novo lead</h3>
+    <div class="form-group"><label>Nome / Empresa</label><input type="text" id="l-name" placeholder="Ex: Empresa ABC"></div>
+    <div class="form-group"><label>Contato</label><input type="text" id="l-contact" placeholder="E-mail ou WhatsApp"></div>
+    <div class="form-group"><label>Valor estimado (R$)</label><input type="number" id="l-value" placeholder="0"></div>
+    <div class="form-group"><label>Estágio</label>
+      <select id="l-stage">
+        <option value="prospeccao">Prospecção</option>
+        <option value="qualificacao">Qualificação</option>
+        <option value="proposta">Proposta</option>
+        <option value="negociacao">Negociação</option>
+        <option value="fechamento">Fechamento</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lead')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Approval -->
+<div class="modal-overlay" id="modal-approval">
+  <div class="modal">
+    <h3 class="modal-title">Novo criativo para aprovação</h3>
+    <div class="form-group"><label>Título</label><input type="text" id="ap-title" placeholder="Ex: Post Instagram - Promoção"></div>
+    <div class="form-group"><label>Cliente</label><input type="text" id="ap-client" placeholder="Nome do cliente"></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="ap-type">
+        <option value="Arte estática">Arte estática</option>
+        <option value="Vídeo">Vídeo</option>
+        <option value="Copy">Copy</option>
+        <option value="Campanha">Campanha</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-approval')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveApproval()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Financial -->
+<div class="modal-overlay" id="modal-fin">
+  <div class="modal">
+    <h3 class="modal-title" id="fin-modal-title">Nova entrada</h3>
+    <input type="hidden" id="fin-type" value="entry">
+    <div class="form-group"><label>Descrição</label><input type="text" id="fin-desc" placeholder="Ex: Pagamento cliente X"></div>
+    <div class="form-group"><label>Valor (R$)</label><input type="number" id="fin-val" placeholder="0,00"></div>
+    <div class="form-group"><label>Data</label><input type="date" id="fin-date"></div>
+    <div class="form-group" id="fin-parcelas-group">
+      <label>Parcelado?</label>
+      <select id="fin-parcelas">
+        <option value="1">À vista</option>
+        <option value="2">2x</option>
+        <option value="3">3x</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-fin')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveFinEntry()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Charge Modal -->
+<div class="modal-overlay" id="modal-charge">
+  <div class="modal">
+    <h3 class="modal-title">Cobrança avulsa</h3>
+    <div class="form-group"><label>Cliente</label><input type="text" id="ch-client" placeholder="Nome do cliente"></div>
+    <div class="form-group"><label>Descrição</label><input type="text" id="ch-desc" placeholder="Descrição da cobrança"></div>
+    <div class="form-group"><label>Valor (R$)</label><input type="number" id="ch-val" placeholder="0,00"></div>
+    <div class="form-group"><label>Data de vencimento</label><input type="date" id="ch-date"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-charge')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveCharge()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Member -->
+<div class="modal-overlay" id="modal-member">
+  <div class="modal">
+    <h3 class="modal-title">Novo membro</h3>
+    <div class="form-group"><label>Nome</label><input type="text" id="mem-name" placeholder="Nome completo"></div>
+    <div class="form-group"><label>Cargo</label><input type="text" id="mem-role" placeholder="Ex: Designer, Gestor de tráfego..."></div>
+    <div class="form-group"><label>E-mail</label><input type="email" id="mem-email" placeholder="email@empresa.com"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-member')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveMember()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="modal-overlay" id="modal-timeline">
+  <div class="modal" style="max-width:340px">
+    <h3 class="modal-title">Progresso da tarefa</h3>
+    <div class="form-group">
+      <label>Porcentagem concluída</label>
+      <input type="range" id="tl-range" min="0" max="100" step="5" value="0" oninput="document.getElementById('tl-val').textContent=this.value+'%'" style="width:100%;accent-color:var(--accent)">
+      <div style="text-align:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-top:8px" id="tl-val">0%</div>
+    </div>
+    <input type="hidden" id="tl-client-id">
+    <input type="hidden" id="tl-task-id">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-timeline')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveTimeline()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ═══════════════════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey: "AIzaSyDltiNLAfrdSjnC_ICm-xMo8IKfAkj50P8",
+  authDomain: "agencyos-bba17.firebaseapp.com",
+  projectId: "agencyos-bba17",
+  storageBucket: "agencyos-bba17.firebasestorage.app",
+  messagingSenderId: "956161671305",
+  appId: "1:956161671305:web:5985e0148c9f99abbe8658"
+};
+const RTDB_URL = "https://agencyos-bba17-default-rtdb.firebaseio.com";
+
+firebase.initializeApp(FB_CONFIG);
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// ═══════════════════════════════════════════════════════════
+// STATE — single source of truth
+// ═══════════════════════════════════════════════════════════
+let STATE = {
+  clients: [],
+  leads: [],
+  approvals: [],
+  financial: [],
+  charges: [],
+  team: [],
+  integrations: {},
+  statuses: {}
+};
+let currentUser = null;
+let syncTimer = null;
+let isSaving = false;
+
+const DEFAULT_STATUSES = [
+  { id: 'todo',       name: 'A fazer',     color: '#5a5a72' },
+  { id: 'doing',      name: 'Em andamento', color: '#3b9eff' },
+  { id: 'review',     name: 'Em revisão',  color: '#f59e0b' },
+  { id: 'done',       name: 'Concluído',   color: '#1fc88a' }
+];
+
+const COLORS = ['#7c6ff7','#3b9eff','#1fc88a','#f59e0b','#f05c5c','#ec4899','#8b5cf6','#06b6d4','#10b981','#f97316','#6366f1','#14b8a6'];
+const INTEGRATIONS_DEF = [
+  {id:'meta',name:'Meta Ads',icon:'ti-brand-meta',color:'#1877f2'},
+  {id:'google-ads',name:'Google Ads',icon:'ti-brand-google',color:'#4285f4'},
+  {id:'analytics',name:'Analytics',icon:'ti-chart-pie',color:'#e37400'},
+  {id:'tiktok',name:'TikTok Ads',icon:'ti-brand-tiktok',color:'#ff0050'},
+  {id:'canva',name:'Canva',icon:'ti-pencil',color:'#00c4cc'},
+  {id:'figma',name:'Figma',icon:'ti-brand-figma',color:'#f24e1e'},
+  {id:'gmail',name:'Gmail',icon:'ti-mail',color:'#ea4335'},
+  {id:'whatsapp',name:'WhatsApp',icon:'ti-brand-whatsapp',color:'#25d366'},
+  {id:'stripe',name:'Stripe',icon:'ti-credit-card',color:'#635bff'},
+  {id:'asaas',name:'Asaas',icon:'ti-building-bank',color:'#005aff'},
+  {id:'rd',name:'RD Station',icon:'ti-rocket',color:'#0041d0'},
+  {id:'semrush',name:'SEMrush',icon:'ti-search',color:'#ff642d'},
+  {id:'gcal',name:'Google Agenda',icon:'ti-calendar',color:'#4285f4',fixed:true}
+];
+const CRM_STAGES = [
+  {id:'prospeccao',name:'Prospecção',color:'#5a5a72'},
+  {id:'qualificacao',name:'Qualificação',color:'#3b9eff'},
+  {id:'proposta',name:'Proposta',color:'#f59e0b'},
+  {id:'negociacao',name:'Negociação',color:'#f05c5c'},
+  {id:'fechamento',name:'Fechamento',color:'#1fc88a'}
+];
+
+let currentClientId = null;
+let currentSection = 'dashboard';
+let calDate = new Date();
+let finUnlocked = false;
+const FIN_HASH = 'c729e6b4a57c2a42bb3910d0fd1cde201e34917744ef81df677cfb632208ecde';
+
+// ═══════════════════════════════════════════════════════════
+// SHA-256 helper
+// ═══════════════════════════════════════════════════════════
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FIREBASE RTDB — REST API
+// ═══════════════════════════════════════════════════════════
+async function getUserPath() {
+  if (!currentUser) return null;
+  const h = await sha256(currentUser.email);
+  return `users/${h}`;
+}
+
+async function getToken() {
+  if (!currentUser) return null;
+  return await currentUser.getIdToken(false);
+}
+
+async function rtdbGet() {
+  try {
+    setSyncStatus('syncing');
+    const path = await getUserPath();
+    const token = await getToken();
+    if (!path || !token) return null;
+    const res = await fetch(`${RTDB_URL}/${path}.json?auth=${token}`);
+    if (!res.ok) throw new Error('RTDB get failed: ' + res.status);
+    const data = await res.json();
+    setSyncStatus('ok');
+    return data;
+  } catch(e) {
+    console.error('RTDB get error:', e);
+    setSyncStatus('error');
+    return null;
+  }
+}
+
+async function rtdbSave() {
+  if (!currentUser || isSaving) return;
+  isSaving = true;
+  setSyncStatus('syncing');
+  try {
+    const path = await getUserPath();
+    const token = await getToken();
+    if (!path || !token) return;
+    const payload = JSON.stringify(STATE);
+    const res = await fetch(`${RTDB_URL}/${path}.json?auth=${token}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload
+    });
+    if (!res.ok) throw new Error('RTDB save failed: ' + res.status);
+    // also save locally
+    localStorage.setItem('ao_state_v3', JSON.stringify(STATE));
+    setSyncStatus('ok');
+  } catch(e) {
+    console.error('RTDB save error:', e);
+    setSyncStatus('error');
+    // still save locally
+    localStorage.setItem('ao_state_v3', JSON.stringify(STATE));
+  } finally {
+    isSaving = false;
+  }
+}
+
+function scheduleSave() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(rtdbSave, 600);
+}
+
+async function loadUserData() {
+  setSyncStatus('syncing');
+  // Try RTDB first
+  const cloud = await rtdbGet();
+  if (cloud && cloud.clients !== undefined) {
+    STATE = { ...STATE, ...cloud };
+    localStorage.setItem('ao_state_v3', JSON.stringify(STATE));
+    console.log('✅ Loaded from RTDB');
+    return;
+  }
+  // Fallback: localStorage
+  const local = localStorage.getItem('ao_state_v3');
+  if (local) {
+    try {
+      const parsed = JSON.parse(local);
+      STATE = { ...STATE, ...parsed };
+      console.log('✅ Loaded from localStorage');
+      // Push local data to cloud
+      await rtdbSave();
+    } catch(e) { console.error('localStorage parse error:', e); }
+  }
+}
+
+function setSyncStatus(status) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('topbar-sync');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (status === 'syncing' ? ' syncing' : status === 'error' ? ' error' : '');
+  if (label) {
+    if (status === 'syncing') label.innerHTML = '<i class="ti ti-cloud" style="font-size:14px;color:var(--amber)"></i> Salvando...';
+    else if (status === 'error') label.innerHTML = '<i class="ti ti-cloud-off" style="font-size:14px;color:var(--red)"></i> Erro ao salvar';
+    else label.innerHTML = '<i class="ti ti-cloud-check" style="font-size:14px;color:var(--green)"></i> Sincronizado';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    await loadUserData();
+    initApp(user);
+  } else {
+    currentUser = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+  }
+});
+
+function switchLoginTab(tab) {
+  document.querySelectorAll('.login-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+}
+
+async function loginEmail() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) { showLoginError(e.message); }
+}
+
+async function registerEmail() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: name });
+  } catch(e) { showLoginError(e.message); }
+}
+
+async function loginGoogle() {
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    await auth.signInWithPopup(provider);
+  } catch(e) { showLoginError(e.message); }
+}
+
+function logout() {
+  if (confirm('Sair da conta?')) {
+    finUnlocked = false;
+    auth.signOut();
+  }
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.style.display = 'block';
+  el.textContent = msg;
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════════════════
+function initApp(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  const name = user.displayName || user.email.split('@')[0];
+  document.getElementById('sidebar-user-name').textContent = name;
+  document.getElementById('sidebar-user-email').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = name[0].toUpperCase();
+  initColorSwatches();
+  nav('dashboard');
+}
+
+function initColorSwatches() {
+  const container = document.getElementById('client-color-swatches');
+  container.innerHTML = '';
+  COLORS.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'color-swatch';
+    div.style.background = c;
+    div.onclick = () => { document.getElementById('c-color').value = c; document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected')); div.classList.add('selected'); };
+    container.appendChild(div);
+  });
+  // custom color
+  const custom = document.createElement('div');
+  custom.className = 'color-custom';
+  const inp = document.createElement('input');
+  inp.type = 'color';
+  inp.onchange = (e) => { document.getElementById('c-color').value = e.target.value; };
+  custom.appendChild(inp);
+  container.appendChild(custom);
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const SECTION_CONFIG = {
+  dashboard: { title: 'Dashboard', add: false },
+  projects:  { title: 'Projetos', add: true, addLabel: 'Novo cliente', addFn: () => openModal('modal-client') },
+  calendar:  { title: 'Calendário', add: false },
+  crm:       { title: 'CRM', add: true, addLabel: 'Novo lead', addFn: () => openModal('modal-lead') },
+  approvals: { title: 'Aprovações', add: true, addLabel: 'Novo criativo', addFn: () => openModal('modal-approval') },
+  financial: { title: 'Financeiro', add: false },
+  team:      { title: 'Equipe', add: true, addLabel: 'Novo membro', addFn: () => openModal('modal-member') },
+  integrations: { title: 'Integrações', add: false }
+};
+
+function nav(section) {
+  currentSection = section;
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === section || el.getAttribute('onclick')?.includes(`'${section}'`));
+  });
+  document.querySelectorAll('[id^="sec-"]').forEach(el => el.style.display = 'none');
+  document.getElementById(`sec-${section}`).style.display = '';
+  const cfg = SECTION_CONFIG[section];
+  document.getElementById('topbar-title').textContent = cfg.title;
+  const addBtn = document.getElementById('topbar-add-btn');
+  if (cfg.add) {
+    addBtn.style.display = 'inline-flex';
+    document.getElementById('topbar-add-label').textContent = cfg.addLabel;
+  } else {
+    addBtn.style.display = 'none';
+  }
+  // Lock financeiro when leaving
+  if (section !== 'financial') { /* keep unlocked state */ }
+  // Render section
+  const renders = {
+    dashboard: renderDashboard,
+    projects: renderProjects,
+    calendar: renderCalendar,
+    crm: renderCRM,
+    approvals: renderApprovals,
+    financial: renderFinancial,
+    team: renderTeam,
+    integrations: renderIntegrations
+  };
+  if (renders[section]) renders[section]();
+}
+
+function topbarAdd() {
+  const cfg = SECTION_CONFIG[currentSection];
+  if (cfg && cfg.addFn) cfg.addFn();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════════════════
+// CLIENTS / PROJECTS
+// ═══════════════════════════════════════════════════════════
+function getClientStatuses(clientId) {
+  if (!STATE.statuses[clientId] || STATE.statuses[clientId].length === 0) return [...DEFAULT_STATUSES];
+  return STATE.statuses[clientId];
+}
+
+function saveClient() {
+  const name = document.getElementById('c-name').value.trim();
+  const segment = document.getElementById('c-segment').value.trim();
+  const color = document.getElementById('c-color').value;
+  if (!name) return;
+  const client = { id: Date.now().toString(), name, segment, color, tasks: [] };
+  STATE.clients.push(client);
+  STATE.statuses[client.id] = [...DEFAULT_STATUSES];
+  scheduleSave();
+  closeModal('modal-client');
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-segment').value = '';
+  renderProjects();
+}
+
+function renderProjects() {
+  const grid = document.getElementById('clients-grid');
+  grid.innerHTML = '';
+  STATE.clients.forEach(client => {
+    const tasks = client.tasks || [];
+    const done = tasks.filter(t => {
+      const statuses = getClientStatuses(client.id);
+      const last = statuses[statuses.length - 1];
+      return t.statusId === last?.id;
+    }).length;
+    const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+    const card = document.createElement('div');
+    card.className = 'client-card';
+    card.innerHTML = `
+      <div class="client-header">
+        <div class="client-icon" style="background:${client.color}">${client.name[0].toUpperCase()}</div>
+        <div>
+          <div class="client-name">${client.name}</div>
+          <div class="client-segment">${client.segment || 'Sem segmento'}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto;color:var(--red)" onclick="event.stopPropagation();deleteClient('${client.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px"><span>Progresso</span><span>${pct}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="client-stats">
+        <div class="client-stat"><strong>${tasks.length}</strong> tarefas</div>
+        <div class="client-stat"><strong>${done}</strong> concluídas</div>
+      </div>
+    `;
+    card.addEventListener('click', (e) => { if (!e.target.closest('button')) openClient(client.id); });
+    grid.appendChild(card);
+  });
+  renderDashboard();
+}
+
+function deleteClient(id) {
+  if (!confirm('Excluir este cliente e todas as tarefas?')) return;
+  STATE.clients = STATE.clients.filter(c => c.id !== id);
+  scheduleSave();
+  renderProjects();
+}
+
+function openClient(id) {
+  currentClientId = id;
+  const client = STATE.clients.find(c => c.id === id);
+  if (!client) return;
+  document.getElementById('projects-list-view').style.display = 'none';
+  document.getElementById('project-client-view').style.display = '';
+  document.getElementById('cv-icon').textContent = client.name[0].toUpperCase();
+  document.getElementById('cv-icon').style.background = client.color;
+  document.getElementById('cv-name').textContent = client.name;
+  document.getElementById('cv-segment').textContent = client.segment || '';
+  switchClientTab('tasks');
+}
+
+function backToClients() {
+  currentClientId = null;
+  document.getElementById('projects-list-view').style.display = '';
+  document.getElementById('project-client-view').style.display = 'none';
+}
+
+function switchClientTab(tab) {
+  document.querySelectorAll('#project-client-view .tab-btn').forEach((b,i) => b.classList.toggle('active', ['tasks','kanban','status'][i]===tab));
+  document.getElementById('client-tab-tasks').style.display = tab === 'tasks' ? '' : 'none';
+  document.getElementById('client-tab-kanban').style.display = tab === 'kanban' ? '' : 'none';
+  document.getElementById('client-tab-status').style.display = tab === 'status' ? '' : 'none';
+  if (tab === 'tasks') renderTasks();
+  if (tab === 'kanban') renderKanban();
+  if (tab === 'status') renderStatusManager();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TASKS
+// ═══════════════════════════════════════════════════════════
+function openAddTaskModal() {
+  const statuses = getClientStatuses(currentClientId);
+  const sel = document.getElementById('t-status');
+  sel.innerHTML = statuses.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('t-title').value = '';
+  document.getElementById('t-resp').value = '';
+  document.getElementById('t-priority').value = '1';
+  updateModalStars(1);
+  document.getElementById('t-deadline').value = '';
+  openModal('modal-task');
+}
+
+document.getElementById('modal-stars').addEventListener('click', e => {
+  const star = e.target.closest('[data-v]');
+  if (!star) return;
+  const v = parseInt(star.dataset.v);
+  document.getElementById('t-priority').value = v;
+  updateModalStars(v);
+});
+
+function updateModalStars(v) {
+  document.querySelectorAll('#modal-stars i').forEach(s => {
+    s.className = 'ti ' + (parseInt(s.dataset.v) <= v ? 'ti-star-filled active' : 'ti-star');
+    s.style.color = parseInt(s.dataset.v) <= v ? 'var(--amber)' : 'var(--text3)';
+  });
+}
+
+function saveTask() {
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) return;
+  const client = STATE.clients.find(c => c.id === currentClientId);
+  if (!client) return;
+  if (!client.tasks) client.tasks = [];
+  const statuses = getClientStatuses(currentClientId);
+  client.tasks.push({
+    id: Date.now().toString(),
+    title,
+    resp: document.getElementById('t-resp').value.trim(),
+    statusId: document.getElementById('t-status').value || statuses[0]?.id,
+    deadline: document.getElementById('t-deadline').value,
+    priority: parseInt(document.getElementById('t-priority').value) || 1,
+    timeline: 0
+  });
+  scheduleSave();
+  closeModal('modal-task');
+  renderTasks();
+  renderDashboard();
+}
+
+function renderTasks() {
+  const client = STATE.clients.find(c => c.id === currentClientId);
+  if (!client) return;
+  const statuses = getClientStatuses(currentClientId);
+  const tbody = document.getElementById('tasks-tbody');
+  tbody.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  (client.tasks || []).forEach((task, idx) => {
+    const status = statuses.find(s => s.id === task.statusId) || statuses[0];
+    const isLate = task.deadline && new Date(task.deadline) < today && status?.id !== statuses[statuses.length-1]?.id;
+    const tr = document.createElement('tr');
+    if (isLate) tr.style.background = 'rgba(240,92,92,0.05)';
+    tr.innerHTML = `
+      <td>
+        ${isLate ? '<i class="ti ti-alert-triangle" style="color:var(--red);margin-right:5px"></i>' : ''}
+        ${task.title}
+      </td>
+      <td style="color:var(--text2)">${task.resp || '—'}</td>
+      <td>
+        <button class="status-pill" style="background:${status?.color}22;color:${status?.color};border:1px solid ${status?.color}44" onclick="cycleStatus('${currentClientId}','${task.id}')">${status?.name || '?'}</button>
+      </td>
+      <td>
+        <button class="timeline-btn" onclick="openTimeline('${currentClientId}','${task.id}',${task.timeline||0})">
+          <i class="ti ti-percentage"></i> ${task.timeline || 0}%
+        </button>
+      </td>
+      <td style="color:${isLate?'var(--red)':'var(--text2)'}">
+        ${task.deadline ? new Date(task.deadline+'T12:00:00').toLocaleDateString('pt-BR') : '—'}
+      </td>
+      <td>
+        <div class="priority-stars">
+          ${[1,2,3].map(n => `<i class="ti ti-star${task.priority>=n?'-filled':''}" style="font-size:14px;color:${task.priority>=n?'var(--amber)':'var(--text3)'}" onclick="setPriority('${currentClientId}','${task.id}',${n})"></i>`).join('')}
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteTask('${currentClientId}','${task.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function cycleStatus(clientId, taskId) {
+  const client = STATE.clients.find(c => c.id === clientId);
+  if (!client) return;
+  const task = (client.tasks || []).find(t => t.id === taskId);
+  if (!task) return;
+  const statuses = getClientStatuses(clientId);
+  const idx = statuses.findIndex(s => s.id === task.statusId);
+  task.statusId = statuses[(idx + 1) % statuses.length].id;
+  scheduleSave();
+  renderTasks();
+  renderKanban();
+}
+
+function setPriority(clientId, taskId, p) {
+  const client = STATE.clients.find(c => c.id === clientId);
+  const task = (client?.tasks || []).find(t => t.id === taskId);
+  if (!task) return;
+  task.priority = p;
+  scheduleSave();
+  renderTasks();
+}
+
+function deleteTask(clientId, taskId) {
+  const client = STATE.clients.find(c => c.id === clientId);
+  if (!client) return;
+  client.tasks = (client.tasks || []).filter(t => t.id !== taskId);
+  scheduleSave();
+  renderTasks();
+  renderKanban();
+  renderDashboard();
+}
+
+function openTimeline(clientId, taskId, current) {
+  document.getElementById('tl-client-id').value = clientId;
+  document.getElementById('tl-task-id').value = taskId;
+  document.getElementById('tl-range').value = current;
+  document.getElementById('tl-val').textContent = current + '%';
+  openModal('modal-timeline');
+}
+
+function saveTimeline() {
+  const clientId = document.getElementById('tl-client-id').value;
+  const taskId = document.getElementById('tl-task-id').value;
+  const val = parseInt(document.getElementById('tl-range').value);
+  const client = STATE.clients.find(c => c.id === clientId);
+  const task = (client?.tasks || []).find(t => t.id === taskId);
+  if (task) { task.timeline = val; scheduleSave(); renderTasks(); }
+  closeModal('modal-timeline');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KANBAN
+// ═══════════════════════════════════════════════════════════
+function renderKanban() {
+  const client = STATE.clients.find(c => c.id === currentClientId);
+  if (!client) return;
+  const statuses = getClientStatuses(currentClientId);
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = '';
+  statuses.forEach(status => {
+    const tasks = (client.tasks || []).filter(t => t.statusId === status.id);
+    const col = document.createElement('div');
+    col.className = 'kanban-col';
+    col.innerHTML = `
+      <div class="kanban-col-title">
+        <span style="width:8px;height:8px;border-radius:50%;background:${status.color};display:inline-block"></span>
+        ${status.name} <span class="kanban-count">${tasks.length}</span>
+      </div>
+      ${tasks.map(t => `
+        <div class="kanban-card">
+          <div class="kanban-card-title">${t.title}</div>
+          <div class="kanban-card-meta">
+            ${t.resp ? `<span style="font-size:11px;color:var(--text2)">${t.resp}</span>` : ''}
+            ${t.deadline ? `<span class="badge badge-blue" style="font-size:10px">${new Date(t.deadline+'T12:00:00').toLocaleDateString('pt-BR')}</span>` : ''}
+            <span style="font-size:11px;color:var(--text2)">${t.timeline||0}%</span>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    board.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATUS MANAGER
+// ═══════════════════════════════════════════════════════════
+function renderStatusManager() {
+  const statuses = getClientStatuses(currentClientId);
+  const list = document.getElementById('status-manager-list');
+  list.innerHTML = statuses.map((s,i) => `
+    <div class="status-row">
+      <div class="status-color-preview" style="background:${s.color}"></div>
+      <span style="font-size:13px;flex:1">${s.name}</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteStatus('${s.id}')"><i class="ti ti-trash"></i></button>
+    </div>
+  `).join('');
+}
+
+function addStatus() {
+  const name = document.getElementById('new-status-name').value.trim();
+  const color = document.getElementById('new-status-color').value;
+  if (!name) return;
+  if (!STATE.statuses[currentClientId]) STATE.statuses[currentClientId] = [...DEFAULT_STATUSES];
+  STATE.statuses[currentClientId].push({ id: Date.now().toString(), name, color });
+  document.getElementById('new-status-name').value = '';
+  scheduleSave();
+  renderStatusManager();
+}
+
+function deleteStatus(id) {
+  if (!STATE.statuses[currentClientId]) return;
+  STATE.statuses[currentClientId] = STATE.statuses[currentClientId].filter(s => s.id !== id);
+  scheduleSave();
+  renderStatusManager();
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  let totalTasks = 0, doneTasks = 0;
+  STATE.clients.forEach(c => {
+    const tasks = c.tasks || [];
+    const statuses = getClientStatuses(c.id);
+    const lastStatus = statuses[statuses.length - 1]?.id;
+    totalTasks += tasks.length;
+    doneTasks += tasks.filter(t => t.statusId === lastStatus).length;
+  });
+  const rate = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
+  document.getElementById('m-clients').textContent = STATE.clients.length;
+  document.getElementById('m-total').textContent = totalTasks;
+  document.getElementById('m-done').textContent = doneTasks;
+  document.getElementById('m-rate').textContent = rate + '%';
+  document.getElementById('m-progress').style.width = rate + '%';
+  // Client progress
+  const cProg = document.getElementById('dash-clients-progress');
+  cProg.innerHTML = STATE.clients.slice(0,6).map(c => {
+    const tasks = c.tasks || [];
+    const statuses = getClientStatuses(c.id);
+    const last = statuses[statuses.length-1]?.id;
+    const done = tasks.filter(t => t.statusId === last).length;
+    const pct = tasks.length ? Math.round(done/tasks.length*100) : 0;
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${c.color};display:inline-block"></span>${c.name}</span>
+        <span style="color:var(--text2)">${pct}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Nenhum cliente cadastrado</div>';
+  // Recent tasks
+  const allTasks = STATE.clients.flatMap(c => (c.tasks||[]).map(t => ({...t, clientName: c.name, clientColor: c.color, clientId: c.id})));
+  allTasks.sort((a,b) => (b.id||0)-(a.id||0));
+  const rTasks = document.getElementById('dash-recent-tasks');
+  rTasks.innerHTML = allTasks.slice(0,5).map(t => {
+    const statuses = getClientStatuses(t.clientId);
+    const status = statuses.find(s => s.id === t.statusId) || statuses[0];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="width:8px;height:8px;border-radius:50%;background:${status?.color||'#888'};flex-shrink:0"></span>
+      <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.title}</span>
+      <span style="font-size:11px;color:var(--text2)">${t.clientName}</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Nenhuma tarefa</div>';
+}
+
+// ═══════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════
+function calNav(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-title').textContent = new Date(y,m,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const allTasks = STATE.clients.flatMap(c => (c.tasks||[]).map(t => ({...t, clientColor: c.color})));
+  const first = new Date(y,m,1).getDay();
+  const days = new Date(y,m+1,0).getDate();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d => `<div class="cal-day-name">${d}</div>`).join('');
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 0; i < first; i++) grid.innerHTML += `<div class="cal-day other-month"></div>`;
+  for (let d = 1; d <= days; d++) {
+    const date = new Date(y,m,d);
+    const dateStr = date.toISOString().split('T')[0];
+    const dayTasks = allTasks.filter(t => t.deadline === dateStr);
+    const isToday = date.getTime() === today.getTime();
+    grid.innerHTML += `<div class="cal-day${isToday?' today':''}">
+      <div class="cal-day-num">${d}</div>
+      ${dayTasks.map(t => `<span class="cal-dot" style="background:${t.clientColor}" title="${t.title}"></span>`).join('')}
+    </div>`;
+  }
+  // Upcoming
+  const upcoming = document.getElementById('upcoming-tasks');
+  const future = allTasks.filter(t => t.deadline && new Date(t.deadline+'T12:00:00') >= today).sort((a,b) => a.deadline.localeCompare(b.deadline));
+  upcoming.innerHTML = future.slice(0,8).map(t => {
+    const dl = new Date(t.deadline+'T12:00:00');
+    const diff = Math.ceil((dl - today) / 86400000);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="width:8px;height:8px;border-radius:50%;background:${t.clientColor};flex-shrink:0"></span>
+      <span style="font-size:13px;flex:1">${t.title}</span>
+      <span class="badge ${diff===0?'badge-red':diff<=3?'badge-amber':'badge-blue'}">${diff===0?'Hoje':diff===1?'Amanhã':diff+' dias'}</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--text3);font-size:13px">Nenhum prazo próximo</div>';
+}
+
+// ═══════════════════════════════════════════════════════════
+// CRM
+// ═══════════════════════════════════════════════════════════
+function saveLead() {
+  const name = document.getElementById('l-name').value.trim();
+  if (!name) return;
+  STATE.leads.push({
+    id: Date.now().toString(),
+    name,
+    contact: document.getElementById('l-contact').value.trim(),
+    value: parseFloat(document.getElementById('l-value').value) || 0,
+    stage: document.getElementById('l-stage').value
+  });
+  scheduleSave();
+  closeModal('modal-lead');
+  renderCRM();
+}
+
+function renderCRM() {
+  const board = document.getElementById('crm-board');
+  board.innerHTML = '';
+  CRM_STAGES.forEach(stage => {
+    const leads = STATE.leads.filter(l => l.stage === stage.id);
+    const total = leads.reduce((s,l) => s + (l.value||0), 0);
+    const col = document.createElement('div');
+    col.className = 'crm-stage';
+    col.innerHTML = `
+      <div class="crm-stage-title">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${stage.color};display:inline-block"></span>${stage.name}</span>
+        <span class="badge badge-purple">${leads.length}</span>
+      </div>
+      ${leads.map(l => `
+        <div class="crm-card">
+          <div class="crm-name">${l.name}</div>
+          <div class="crm-contact">${l.contact || '—'}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="crm-value">${l.value ? 'R$ '+l.value.toLocaleString('pt-BR') : '—'}</div>
+            <button class="btn btn-danger btn-sm" onclick="deleteLead('${l.id}')"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+      `).join('')}
+      ${total > 0 ? `<div style="font-size:12px;color:var(--text2);margin-top:8px">Total: R$ ${total.toLocaleString('pt-BR')}</div>` : ''}
+    `;
+    board.appendChild(col);
+  });
+}
+
+function deleteLead(id) {
+  STATE.leads = STATE.leads.filter(l => l.id !== id);
+  scheduleSave();
+  renderCRM();
+}
+
+// ═══════════════════════════════════════════════════════════
+// APPROVALS
+// ═══════════════════════════════════════════════════════════
+function saveApproval() {
+  STATE.approvals.push({
+    id: Date.now().toString(),
+    title: document.getElementById('ap-title').value.trim(),
+    client: document.getElementById('ap-client').value.trim(),
+    type: document.getElementById('ap-type').value,
+    status: 'pending'
+  });
+  scheduleSave();
+  closeModal('modal-approval');
+  renderApprovals();
+}
+
+function updateApproval(id, status) {
+  const ap = STATE.approvals.find(a => a.id === id);
+  if (ap) { ap.status = status; scheduleSave(); renderApprovals(); }
+}
+
+function renderApprovals() {
+  const grid = document.getElementById('approvals-grid');
+  grid.innerHTML = STATE.approvals.map(ap => `
+    <div class="approval-card">
+      <div class="approval-type">${ap.type}</div>
+      <div class="approval-title">${ap.title}</div>
+      <div class="approval-client">${ap.client}</div>
+      <div style="margin-bottom:14px">
+        <span class="badge ${ap.status==='approved'?'badge-green':ap.status==='review'?'badge-amber':'badge-blue'}">
+          ${ap.status==='approved'?'Aprovado':ap.status==='review'?'Revisão':'Pendente'}
+        </span>
+      </div>
+      <div class="approval-actions">
+        <button class="btn btn-sm" style="background:rgba(31,200,138,0.15);color:var(--green)" onclick="updateApproval('${ap.id}','approved')"><i class="ti ti-check"></i> Aprovar</button>
+        <button class="btn btn-ghost btn-sm" onclick="updateApproval('${ap.id}','review')"><i class="ti ti-refresh"></i> Revisão</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteApproval('${ap.id}')"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>
+  `).join('') || '<div style="color:var(--text3)">Nenhum criativo para aprovação</div>';
+}
+
+function deleteApproval(id) {
+  STATE.approvals = STATE.approvals.filter(a => a.id !== id);
+  scheduleSave();
+  renderApprovals();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FINANCIAL
+// ═══════════════════════════════════════════════════════════
+async function checkFinPin() {
+  const val = document.getElementById('fin-pin').value;
+  const h = await sha256(val);
+  const stored = localStorage.getItem('ao_fh') || FIN_HASH;
+  if (h === stored) {
+    finUnlocked = true;
+    document.getElementById('fin-lock').style.display = 'none';
+    document.getElementById('fin-content').style.display = '';
+    renderFinancial();
+    loadIAInsight();
+  } else {
+    const err = document.getElementById('fin-pin-error');
+    err.style.display = 'block';
+    err.textContent = 'Senha incorreta';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function renderFinancial() {
+  if (!finUnlocked) {
+    document.getElementById('fin-lock').style.display = 'flex';
+    document.getElementById('fin-content').style.display = 'none';
+    return;
+  }
+  const filterMonth = document.getElementById('fin-filter-month')?.value || '';
+  // Populate months
+  const sel = document.getElementById('fin-filter-month');
+  if (sel) {
+    const allMonths = [...new Set([...STATE.financial, ...STATE.charges].map(e => e.date?.substring(0,7)).filter(Boolean))].sort().reverse();
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">Todos os meses</option>' + allMonths.map(m => {
+      const [y,mo] = m.split('-');
+      const label = new Date(y,mo-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+      return `<option value="${m}" ${m===currentVal?'selected':''}>${label}</option>`;
+    }).join('');
+  }
+  const entries = STATE.financial.filter(e => !filterMonth || e.date?.startsWith(filterMonth));
+  const charges = STATE.charges.filter(e => !filterMonth || e.date?.startsWith(filterMonth));
+  const totalIn = entries.filter(e => e.type==='entry').reduce((s,e) => s+e.value, 0);
+  const totalOut = entries.filter(e => e.type==='exit').reduce((s,e) => s+e.value, 0);
+  const bal = totalIn - totalOut;
+  document.getElementById('fin-in').textContent = 'R$ ' + totalIn.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('fin-out').textContent = 'R$ ' + totalOut.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('fin-bal').textContent = 'R$ ' + bal.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('fin-bal').style.color = bal >= 0 ? 'var(--text)' : 'var(--red)';
+  // Best month
+  const byMonth = {};
+  STATE.financial.forEach(e => {
+    if (!e.date) return;
+    const mo = e.date.substring(0,7);
+    if (!byMonth[mo]) byMonth[mo] = 0;
+    if (e.type === 'entry') byMonth[mo] += e.value;
+    else byMonth[mo] -= e.value;
+  });
+  const best = Math.max(0, ...Object.values(byMonth));
+  document.getElementById('fin-best').textContent = 'R$ ' + best.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  // Chart (last 6 months)
+  const chart = document.getElementById('fin-chart');
+  const months6 = [];
+  for (let i=5; i>=0; i--) {
+    const d = new Date(); d.setMonth(d.getMonth() - i);
+    months6.push(d.toISOString().substring(0,7));
+  }
+  const chartMax = Math.max(1, ...months6.flatMap(mo => {
+    const ins = STATE.financial.filter(e => e.date?.startsWith(mo) && e.type==='entry').reduce((s,e)=>s+e.value,0);
+    const outs = STATE.financial.filter(e => e.date?.startsWith(mo) && e.type==='exit').reduce((s,e)=>s+e.value,0);
+    return [ins, outs];
+  }));
+  chart.innerHTML = months6.map(mo => {
+    const ins = STATE.financial.filter(e => e.date?.startsWith(mo) && e.type==='entry').reduce((s,e)=>s+e.value,0);
+    const outs = STATE.financial.filter(e => e.date?.startsWith(mo) && e.type==='exit').reduce((s,e)=>s+e.value,0);
+    const inH = Math.round((ins/chartMax)*120);
+    const outH = Math.round((outs/chartMax)*120);
+    const label = new Date(mo+'-01').toLocaleDateString('pt-BR',{month:'short'});
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center">
+      <div class="chart-bar-group" style="height:120px;width:100%;align-items:flex-end">
+        <div class="chart-bar" style="height:${inH||2}px;background:var(--green)"></div>
+        <div class="chart-bar" style="height:${outH||2}px;background:var(--red)"></div>
+      </div>
+      <div class="chart-label">${label}</div>
+    </div>`;
+  }).join('');
+  // Alerts
+  const today = new Date().toISOString().split('T')[0];
+  const alerts = STATE.charges.filter(c => c.dueDate <= today && !c.paid);
+  const alertDiv = document.getElementById('fin-alerts');
+  alertDiv.innerHTML = alerts.map(c => `
+    <div class="alert-banner ${c.dueDate < today ? 'alert-red' : 'alert-amber'}">
+      <i class="ti ti-alert-circle"></i>
+      Cobrança ${c.dueDate < today ? 'vencida' : 'vence hoje'}: <strong>${c.client}</strong> — R$ ${c.value?.toLocaleString('pt-BR',{minimumFractionDigits:2})} — ${c.desc}
+      <button class="btn btn-sm" style="margin-left:auto;background:rgba(255,255,255,0.1);color:inherit" onclick="markChargePaid('${c.id}')">Pago</button>
+    </div>
+  `).join('');
+  // Table
+  const all = [...entries.map(e => ({...e, isCharge:false})), ...charges.map(c => ({...c, isCharge:true, type:'charge'}))];
+  all.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  document.getElementById('fin-table').innerHTML = `
+    <table class="tasks-table">
+      <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Valor</th><th></th></tr></thead>
+      <tbody>
+        ${all.map(e => `<tr>
+          <td style="color:var(--text2)">${e.date ? new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+          <td>${e.desc || e.description || '—'} ${e.isCharge ? '<span class="badge badge-amber">cobrança</span>' : ''}</td>
+          <td><span class="badge ${e.type==='entry'?'badge-green':'badge-red'}">${e.type==='entry'?'Entrada':e.type==='exit'?'Saída':'Cobrança'}</span></td>
+          <td style="font-weight:600;color:${e.type==='entry'?'var(--green)':'var(--red)'}">R$ ${(e.value||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteFinEntry('${e.id}','${e.type}')"><i class="ti ti-trash"></i></button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function openFinModal(type) {
+  document.getElementById('fin-type').value = type;
+  document.getElementById('fin-modal-title').textContent = type === 'entry' ? 'Nova entrada' : 'Nova saída';
+  document.getElementById('fin-parcelas-group').style.display = type === 'entry' ? '' : 'none';
+  document.getElementById('fin-desc').value = '';
+  document.getElementById('fin-val').value = '';
+  document.getElementById('fin-date').value = new Date().toISOString().split('T')[0];
+  openModal('modal-fin');
+}
+
+function saveFinEntry() {
+  const type = document.getElementById('fin-type').value;
+  const desc = document.getElementById('fin-desc').value.trim();
+  const value = parseFloat(document.getElementById('fin-val').value) || 0;
+  const date = document.getElementById('fin-date').value;
+  const parcelas = type === 'entry' ? parseInt(document.getElementById('fin-parcelas').value) : 1;
+  if (!desc || !value) return;
+  const entryValue = parcelas > 1 ? value / parcelas : value;
+  STATE.financial.push({ id: Date.now().toString(), type, desc, value: entryValue, date });
+  if (parcelas === 2) {
+    const d2 = new Date(date); d2.setMonth(d2.getMonth()+1);
+    STATE.charges.push({ id: (Date.now()+1).toString(), client: desc, desc: `2ª parcela de ${desc}`, value: entryValue, date: date, dueDate: d2.toISOString().split('T')[0], paid: false });
+  }
+  scheduleSave();
+  closeModal('modal-fin');
+  renderFinancial();
+}
+
+function openChargeModal() {
+  document.getElementById('ch-client').value = '';
+  document.getElementById('ch-desc').value = '';
+  document.getElementById('ch-val').value = '';
+  document.getElementById('ch-date').value = '';
+  openModal('modal-charge');
+}
+
+function saveCharge() {
+  const client = document.getElementById('ch-client').value.trim();
+  const desc = document.getElementById('ch-desc').value.trim();
+  const value = parseFloat(document.getElementById('ch-val').value) || 0;
+  const dueDate = document.getElementById('ch-date').value;
+  if (!client || !value) return;
+  STATE.charges.push({ id: Date.now().toString(), client, desc, value, date: dueDate, dueDate, paid: false });
+  scheduleSave();
+  closeModal('modal-charge');
+  renderFinancial();
+}
+
+function markChargePaid(id) {
+  const ch = STATE.charges.find(c => c.id === id);
+  if (ch) { ch.paid = true; scheduleSave(); renderFinancial(); }
+}
+
+function deleteFinEntry(id, type) {
+  if (type === 'charge') STATE.charges = STATE.charges.filter(e => e.id !== id);
+  else STATE.financial = STATE.financial.filter(e => e.id !== id);
+  scheduleSave();
+  renderFinancial();
+}
+
+async function loadIAInsight() {
+  const banner = document.getElementById('ia-insight');
+  const text = document.getElementById('ia-text');
+  banner.style.display = 'flex';
+  const totalIn = STATE.financial.filter(e => e.type==='entry').reduce((s,e)=>s+e.value,0);
+  const totalOut = STATE.financial.filter(e => e.type==='exit').reduce((s,e)=>s+e.value,0);
+  text.innerHTML = `Faturamento total: <strong>R$ ${totalIn.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong> | Despesas: <strong>R$ ${totalOut.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong> | Saldo: <strong style="color:${totalIn-totalOut>=0?'var(--green)':'var(--red)'}">R$ ${(totalIn-totalOut).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TEAM
+// ═══════════════════════════════════════════════════════════
+const AVATAR_COLORS = ['#7c6ff7','#3b9eff','#1fc88a','#f59e0b','#f05c5c','#ec4899','#8b5cf6'];
+function saveMember() {
+  const name = document.getElementById('mem-name').value.trim();
+  if (!name) return;
+  STATE.team.push({
+    id: Date.now().toString(),
+    name,
+    role: document.getElementById('mem-role').value.trim(),
+    email: document.getElementById('mem-email').value.trim(),
+    color: AVATAR_COLORS[STATE.team.length % AVATAR_COLORS.length]
+  });
+  scheduleSave();
+  closeModal('modal-member');
+  renderTeam();
+}
+
+function renderTeam() {
+  const grid = document.getElementById('team-grid');
+  grid.innerHTML = STATE.team.map(m => `
+    <div class="member-card">
+      <div class="member-avatar" style="background:${m.color}">${m.name[0].toUpperCase()}</div>
+      <div class="member-name">${m.name}</div>
+      <div class="member-role">${m.role || 'Sem cargo'}</div>
+      <div class="member-email">${m.email || '—'}</div>
+      <button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="deleteMember('${m.id}')"><i class="ti ti-trash"></i></button>
+    </div>
+  `).join('') || '<div style="color:var(--text3)">Nenhum membro cadastrado</div>';
+}
+
+function deleteMember(id) {
+  STATE.team = STATE.team.filter(m => m.id !== id);
+  scheduleSave();
+  renderTeam();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTEGRATIONS
+// ═══════════════════════════════════════════════════════════
+function renderIntegrations() {
+  const grid = document.getElementById('integrations-grid');
+  grid.innerHTML = INTEGRATIONS_DEF.map(intg => {
+    const active = intg.fixed ? true : !!STATE.integrations[intg.id];
+    return `
+      <div class="integration-card">
+        <div class="integration-icon" style="background:${intg.color}22;color:${intg.color}"><i class="ti ${intg.icon}"></i></div>
+        <div>
+          <div class="integration-name">${intg.name}</div>
+          <div class="integration-status" style="color:${active?'var(--green)':'var(--text2)'}">${active?(intg.fixed?'excelenciadigitalof@gmail.com':'Ativo'):'Inativo'}</div>
+        </div>
+        ${!intg.fixed ? `<label class="toggle" style="margin-left:auto">
+          <input type="checkbox" ${active?'checked':''} onchange="toggleIntegration('${intg.id}',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>` : `<span class="badge badge-green" style="margin-left:auto">Ativo</span>`}
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleIntegration(id, val) {
+  STATE.integrations[id] = val;
+  scheduleSave();
+}
+
+// ═══════════════════════════════════════════════════════════
+// VISIBILITY CHANGE — lock financeiro
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && currentSection === 'financial') {
+    finUnlocked = false;
+    document.getElementById('fin-lock').style.display = 'flex';
+    document.getElementById('fin-content').style.display = 'none';
+    document.getElementById('fin-pin').value = '';
+  }
+});
+</script>
+</body>
+</html>
